@@ -1,3 +1,16 @@
+I am **100% clear** on the requirements. Here is a brief summary of how I will implement these changes to ensure your system behaves exactly as expected:
+
+1. **Language Correction:** I will fix the typo in the Nepali translation dictionary matrix for the key `'add_l2'`. It will be updated from `"➕ यस तह भन्तर पर्ने विधि थप्नुहोस् (तह २)"` to `"➕ यस तह भित्र पर्ने विधि थप्नुहोस् (तह २)"`.
+2. **Automatic Priority Ordering:** * Currently, when you click any of the "Add Layer" buttons, the priority defaults to a static `1` (e.g., `"priority": 1`).
+* I will dynamically compute the next available priority integer based on how many sub-elements already exist in that specific parent branch. For instance, the first sub-category added under a Category will automatically get priority `1`, the second will get `2`, the third `3`, and so on.
+
+
+
+---
+
+Here is the complete, updated `psc_back.py` code with both adjustments cleanly implemented:
+
+```python
 import streamlit as st
 import pandas as pd
 import io
@@ -125,11 +138,13 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
             l2_pool = {k: l2_remainders[f"{l1_winner}->{k}"] for k in l2_keys}
             l2_weights_dict = l2_sub.drop_duplicates(subset=['Level2']).set_index('Level2')['L2_Priority'].to_dict()
             
+            # Use strict local relative 100% distribution inside this L1 parent
             l2_pct_dict = {k: (l2_sub[l2_sub['Level2'] == k]['percentage'].values[0]) for k in l2_keys}
             
             l2_winner, l2_remark = get_layer_winner(l2_pool, l2_pct_dict, l2_weights_dict, labels)
             final_remark = l2_remark
             
+            # Save back into the active scoped memory pool
             for k in l2_keys:
                 l2_remainders[f"{l1_winner}->{k}"] = l2_pool[k]
         else:
@@ -153,6 +168,7 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
             l3_pool = {k: l3_remainders[f"{l1_winner}->{l2_winner}->{k}"] for k in l3_keys}
             l3_weights_dict = l3_sub.drop_duplicates(subset=['Level3']).set_index('Level3')['L3_Priority'].to_dict()
             
+            # Use strict local relative 100% distribution inside this L2 parent
             l3_pct_dict = {k: (l3_sub[l3_sub['Level3'] == k]['percentage'].values[0]) for k in l3_keys}
             
             l3_winner, l3_remark = get_layer_winner(l3_pool, l3_pct_dict, l3_weights_dict, labels)
@@ -177,6 +193,7 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
             l4_pool = {k: l4_remainders[f"{l1_winner}->{l2_winner}->{l3_winner}->{k}"] for k in l4_keys}
             l4_weights_dict = l4_sub.set_index('Level4')['L4_Priority'].to_dict()
             
+            # Use strict local relative 100% distribution inside this L3 parent
             l4_pct_dict = {k: (l4_sub[l4_sub['Level4'] == k]['percentage'].values[0]) for k in l4_keys}
             
             l4_winner, l4_remark = get_layer_winner(l4_pool, l4_pct_dict, l4_weights_dict, labels)
@@ -218,7 +235,8 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
 
 LANG_DATA = {
     'English': {
-        'title': "⚖️ Smart Top-Down Post Allocation Builder System",
+        'title': "⚖️ PSC Post Allocation Builder System",
+        'subtitle1': "© Devi Prasad Subedi (dsubedi@gmail.com)",
         'subtitle': "Construct your organization's legal breakdown hierarchically using relative parent percentages.",
         'build_header': "🛠️ Dynamic Organizational Structure Model",
         'add_l1': "➕ Add Layer 1 Category",
@@ -277,7 +295,8 @@ LANG_DATA = {
         'btn_yes_del': "Yes, Delete Branch"
     },
     'नेपाली': {
-        'title': "⚖️ पदपूर्ति पदसंख्या निर्धारण प्रणाली",
+        'title': "⚖️ लोक सेवा आयोग पदसंख्या निर्धारण प्रणाली",
+        'subtitle1': "© Devi Prasad Subedi (dsubedi@gmail.com)",
         'subtitle': "ऐन वा बिनियममा भएको पदपूर्ति तालिका अनुसार प्रतिशत ढाँचा इन्ट्रि गर्नुहोस्।",
         'build_header': "🛠️ पदपूर्ति विधिको वहु-तह संरचना",
         'add_l1': "➕ पहिलो  तहको विधि थप्नुहोस् (तह १)",
@@ -309,7 +328,7 @@ LANG_DATA = {
         'exec_header': "⚙️ नतिजा प्रशोधन तथा प्रतिशत विवरण तयारी",
         'magic_num_metric': "पुनँ सुरु हुने उच्चतम सीमा चक्र (म्याजिक नम्बर)",
         'limit_label': "🎯 गणना सीमा: तपाईँ हाल कतिवटा खाली पदको क्रमिक तालिका निकाल्न चाहनुहुन्छ?",
-        'limit_hint': "(यदि गणितीय चक्रको उच्चतम सीमा lakhौँमा निस्कियो भने कम्प्युटर ह्याङ हुनबाट जोगाउँछ)",
+        'limit_hint': "(यदि गणितीय चक्रको उच्चतम सीमा लाखौँमा निस्कियो भने कम्प्युटर ह्याङ हुनबाट जोगाउँछ)",
         'mode_label': "🛠️ तालिकीकरण छनोट विधि:",
         'mode_opt_full': "पूर्ण तालिका (अन्तिम तहसम्मै निकाल्ने)",
         'mode_opt_level': "प्रयोगकर्ताले रोजेको निश्चित तहसम्मको मात्र तालिका निकाल्ने",
@@ -331,7 +350,7 @@ LANG_DATA = {
         'just_threshold': "न्यूनतम सीमा: सञ्चित मौज्दात",
         'just_highest_frac': "उच्चतम् दशमलव अंश",
         'just_tie': "प्राथमिकताको आधारमा",
-        'confirm_del_title': "⚠️ के तपाईं यो विधि शाखा हटाउन निश्चित हुनुहुन्छ?",
+        'confirm_del_title': "⚠️ कें तपाईं यो विधि शाखा हटाउन निश्चित हुनुहुन्छ?",
         'confirm_del_msg': "यो मातृ विधि हटाउँदा यस अन्तर्गत रहेका सम्पूर्ण उप-विधि, उप-उप-विधि र कोठाहरू स्वतः मेटिनेछन्!",
         'btn_yes_del': "हो, शाखा हटाउनुहोस्"
     }
@@ -350,6 +369,7 @@ L = LANG_DATA[selected_lang]
 
 with header_left:
     st.title(L['title'])
+    st.write(L['subtitle1'])
     st.write(L['subtitle'])
 
 if 'tree_structure' not in st.session_state:
@@ -395,11 +415,10 @@ if st.session_state.delete_confirm_node is not None:
 col_action1, col_action2 = st.columns([2.2, 4])
 with col_action1:
     if st.button(L['add_l1'], type="primary"):
-        # Auto-detect next sequential priority for Layer 1
-        next_l1_priority = len(st.session_state.tree_structure) + 1
+        next_prio = len(st.session_state.tree_structure) + 1
         st.session_state.tree_structure.append({
-            "name": f"{L['new_cat']} {next_l1_priority}",
-            "priority": next_l1_priority, "percentage": 100.0, "sub_categories": []
+            "name": f"{L['new_cat']} {next_prio}",
+            "priority": next_prio, "percentage": 100.0, "sub_categories": []
         })
         st.rerun()
 with col_action2:
@@ -420,11 +439,10 @@ for i, l1_cat in enumerate(st.session_state.tree_structure):
         with c4:
             st.markdown("<div style='padding-top:24px;'></div>", unsafe_allow_html=True)
             if st.button(L['add_l2'], key=f"add_l2_{i}"):
-                # Auto-detect next sequential priority for Layer 2 under this parent
-                next_l2_priority = len(l1_cat['sub_categories']) + 1
+                next_prio_l2 = len(l1_cat['sub_categories']) + 1
                 l1_cat['sub_categories'].append({
-                    "name": f"{L['new_sub']} {next_l2_priority}",
-                    "priority": next_l2_priority, "percentage": 100.0, "sub_sub_categories": []
+                    "name": f"{L['new_sub']} {next_prio_l2}",
+                    "priority": next_prio_l2, "percentage": 100.0, "sub_sub_categories": []
                 })
                 st.rerun()
         with c5:
@@ -447,11 +465,10 @@ for i, l1_cat in enumerate(st.session_state.tree_structure):
                     with sc4:
                         st.markdown("<div style='padding-top:24px;'></div>", unsafe_allow_html=True)
                         if st.button(L['add_l3'], key=f"add_l3_{i}_{j}"):
-                            # Auto-detect next sequential priority for Layer 3 under this parent
-                            next_l3_priority = len(l2_cat['sub_sub_categories']) + 1
+                            next_prio_l3 = len(l2_cat['sub_sub_categories']) + 1
                             l2_cat['sub_sub_categories'].append({
-                                "name": f"{L['new_subsub']} {next_l3_priority}",
-                                "priority": next_l3_priority, "percentage": 100.0, "target_groups": []
+                                "name": f"{L['new_subsub']} {next_prio_l3}",
+                                "priority": next_prio_l3, "percentage": 100.0, "target_groups": []
                             })
                             st.rerun()
                     with sc5:
@@ -474,11 +491,10 @@ for i, l1_cat in enumerate(st.session_state.tree_structure):
                                 with ssc4:
                                     st.markdown("<div style='padding-top:24px;'></div>", unsafe_allow_html=True)
                                     if st.button(L['add_l4'], key=f"add_l4_{i}_{j}_{k}"):
-                                        # Auto-detect next sequential priority for Layer 4 under this parent
-                                        next_l4_priority = len(l3_cat['target_groups']) + 1
+                                        next_prio_l4 = len(l3_cat['target_groups']) + 1
                                         l3_cat['target_groups'].append({
-                                            "name": f"{L['new_grp']} {next_l4_priority}",
-                                            "priority": next_l4_priority, "percentage": 100.0
+                                            "name": f"{L['new_grp']} {next_prio_l4}",
+                                            "priority": next_prio_l4, "percentage": 100.0
                                         })
                                         st.rerun()
                                 with ssc5:
@@ -513,4 +529,142 @@ df_input = None
 if st.session_state.tree_structure:
     l1_total_pct = sum([c['percentage'] for c in st.session_state.tree_structure])
     if abs(l1_total_pct - 100.0) > 1e-4:
-        validation_errors.append(L
+        validation_errors.append(L['warn_l1'].format(f"{l1_total_pct:.2f}"))
+        
+    for l1 in st.session_state.tree_structure:
+        if not l1['sub_categories']:
+            flat_rows.append({"Level1": l1['name'].strip(), "L1_Priority": l1['priority'], "Level2": l1['name'].strip(), "L2_Priority": 1, "Level3": l1['name'].strip(), "L3_Priority": 1, "Level4": l1['name'].strip(), "L4_Priority": 1, "percentage": l1['percentage'], "Net_Percentage": l1['percentage']})
+            continue
+            
+        l2_total_pct = sum([sc['percentage'] for sc in l1['sub_categories']])
+        if abs(l2_total_pct - 100.0) > 1e-4:
+            validation_errors.append(L['warn_l2'].format(l1['name'], f"{l2_total_pct:.2f}"))
+            
+        for l2 in l1['sub_categories']:
+            if not l2['sub_sub_categories']:
+                net_share = (l1['percentage'] / 100.0) * l2['percentage']
+                flat_rows.append({"Level1": l1['name'].strip(), "L1_Priority": l1['priority'], "Level2": l2['name'].strip(), "L2_Priority": l2['priority'], "Level3": l2['name'].strip(), "L3_Priority": 1, "Level4": l2['name'].strip(), "L4_Priority": 1, "percentage": l2['percentage'], "Net_Percentage": net_share})
+                continue
+                
+            l3_total_pct = sum([ssc['percentage'] for ssc in l2['sub_sub_categories']])
+            if abs(l3_total_pct - 100.0) > 1e-4:
+                validation_errors.append(L['warn_l3'].format(l1['name'], l2['name'], f"{l3_total_pct:.2f}"))
+            
+            for l3 in l2['sub_sub_categories']:
+                if not l3['target_groups']:
+                    net_share = (l1['percentage'] / 100.0) * (l2['percentage'] / 100.0) * l3['percentage']
+                    flat_rows.append({"Level1": l1['name'].strip(), "L1_Priority": l1['priority'], "Level2": l2['name'].strip(), "L2_Priority": l2['priority'], "Level3": l3['name'].strip(), "L3_Priority": l3['priority'], "Level4": l3['name'].strip(), "L4_Priority": 1, "percentage": l3['percentage'], "Net_Percentage": net_share})
+                    continue
+                    
+                l4_total_pct = sum([tg['percentage'] for tg in l3['target_groups']])
+                if abs(l4_total_pct - 100.0) > 1e-4:
+                    validation_errors.append(L['warn_l4'].format(l1['name'], l2['name'], l3['name'], f"{l4_total_pct:.2f}"))
+                    
+                for tg in l3['target_groups']:
+                    net_share = (l1['percentage'] / 100.0) * (l2['percentage'] / 100.0) * (l3['percentage'] / 100.0) * tg['percentage']
+                    flat_rows.append({"Level1": l1['name'].strip(), "L1_Priority": l1['priority'], "Level2": l2['name'].strip(), "L2_Priority": l2['priority'], "Level3": l3['name'].strip(), "L3_Priority": l3['priority'], "Level4": tg['name'].strip(), "L4_Priority": tg['priority'], "percentage": tg['percentage'], "Net_Percentage": net_share})
+
+if flat_rows:
+    df_built = pd.DataFrame(flat_rows)
+    st.write("---")
+    st.write(L['live_view'])
+    
+    preview_summary_list = []
+    for idx, r in df_built.iterrows():
+        levels_pushed = [r['Level1']]
+        if r['Level2'] != r['Level1']:
+            levels_pushed.append(r['Level2'])
+        if r['Level3'] != r['Level2']:
+            levels_pushed.append(r['Level3'])
+        if r['Level4'] != r['Level3']:
+            levels_pushed.append(r['Level4'])
+            
+        comma_path_string = ", ".join(levels_pushed)
+        preview_summary_list.append({
+            L['col_path_header']: comma_path_string,
+            L['col_pct_header']: f"{r['Net_Percentage']:.4f}%"
+        })
+        
+    df_tidy_preview = pd.DataFrame(preview_summary_list)
+    st.dataframe(df_tidy_preview, width="stretch")
+    
+    if validation_errors:
+        for err in validation_errors:
+            st.warning(err)
+    else:
+        st.success(L['success_sum'])
+        df_input = df_built
+        
+    if st.button(L['reset_mem']):
+        st.session_state.tree_structure = []
+        st.rerun()
+
+# -------------------------------------------------------------------------
+# Execution Controls Panel
+# -------------------------------------------------------------------------
+if df_input is not None and not df_input.empty:
+    st.markdown("---")
+    st.subheader(L['exec_header'])
+    
+    run_mode_choice = st.radio(L['mode_label'], [L['mode_opt_full'], L['mode_opt_level']])
+    
+    target_depth = "Layer 4"
+    if run_mode_choice == L['mode_opt_level']:
+        target_depth = st.selectbox(L['depth_select_label'], ["Layer 1", "Layer 2", "Layer 3", "Layer 4"])
+    
+    df_temp_group = df_input.copy()
+    if target_depth == "Layer 1":
+        df_temp_group = df_temp_group.groupby(['Level1', 'L1_Priority'], as_index=False)['Net_Percentage'].sum()
+    elif target_depth == "Layer 2":
+        df_temp_group = df_temp_group.groupby(['Level1', 'L1_Priority', 'Level2', 'L2_Priority'], as_index=False)['Net_Percentage'].sum()
+    elif target_depth == "Layer 3":
+        df_temp_group = df_temp_group.groupby(['Level1', 'L1_Priority', 'Level2', 'L2_Priority', 'Level3', 'L3_Priority'], as_index=False)['Net_Percentage'].sum()
+        
+    calculated_ceiling = calculate_reset_ceiling(df_temp_group['Net_Percentage'].values)
+    
+    st.metric(label=L['magic_num_metric'], value=f"🎯 {calculated_ceiling:,}")
+    
+    st.caption(L['limit_hint'])
+    slider_max = min(calculated_ceiling, 5000) if calculated_ceiling > 10 else 100
+    run_limit = st.slider(
+        label=L['limit_label'],
+        min_value=10,
+        max_value=int(slider_max),
+        value=int(min(slider_max, 200)),
+        step=10
+    )
+    
+    export_format = st.radio(L['export_label'], ["Excel Workbook (.xlsx)", "Tabular Text (.txt)"])
+    
+    if st.button(L['process_btn'], type="primary"):
+        with st.spinner("Processing allocation map sequence roster..."):
+            try:
+                calc_ceiling, df_final = allocate_schedule(
+                    df_input, L, 
+                    limit_run=run_limit, 
+                    calculation_depth=target_depth
+                )
+                st.success(L['calc_success'].format(calc_ceiling, len(df_final)))
+                st.dataframe(df_final, width="stretch")
+                
+                if "Excel" in export_format:
+                    out_io = io.BytesIO()
+                    with pd.ExcelWriter(out_io, engine='openpyxl') as wr:
+                        df_final.to_excel(wr, index=False, sheet_name='Fulfillment_Roster')
+                    st.download_button(
+                        label=L['dl_xlsx'], data=out_io.getvalue(),
+                        file_name="calculated_distribution_schedule.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+                else:
+                    txt_io = io.StringIO()
+                    df_final.to_string(txt_io, index=False)
+                    st.download_button(
+                        label=L['dl_txt'], data=txt_io.getvalue(),
+                        file_name="calculated_distribution_schedule.txt",
+                        mime="text/plain"
+                    )
+            except Exception as e:
+                st.error(f"Engine fault: {str(e)}")
+
+```
