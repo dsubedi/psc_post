@@ -1,16 +1,3 @@
-I am **100% clear** on the requirements. Here is a brief summary of how I will implement these changes to ensure your system behaves exactly as expected:
-
-1. **Language Correction:** I will fix the typo in the Nepali translation dictionary matrix for the key `'add_l2'`. It will be updated from `"➕ यस तह भन्तर पर्ने विधि थप्नुहोस् (तह २)"` to `"➕ यस तह भित्र पर्ने विधि थप्नुहोस् (तह २)"`.
-2. **Automatic Priority Ordering:** * Currently, when you click any of the "Add Layer" buttons, the priority defaults to a static `1` (e.g., `"priority": 1`).
-* I will dynamically compute the next available priority integer based on how many sub-elements already exist in that specific parent branch. For instance, the first sub-category added under a Category will automatically get priority `1`, the second will get `2`, the third `3`, and so on.
-
-
-
----
-
-Here is the complete, updated `psc_back.py` code with both adjustments cleanly implemented:
-
-```python
 import streamlit as st
 import pandas as pd
 import io
@@ -666,5 +653,3 @@ if df_input is not None and not df_input.empty:
                     )
             except Exception as e:
                 st.error(f"Engine fault: {str(e)}")
-
-```
