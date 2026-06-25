@@ -222,7 +222,7 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
 
 LANG_DATA = {
     'English': {
-        'title': "⚖️ Smart Top-Down Post Allocation Builder System",
+        'title': "⚖️ PSC Post Allocation Builder System",
         'subtitle': "Construct your organization's legal breakdown hierarchically using relative parent percentages.",
         'build_header': "🛠️ Dynamic Organizational Structure Model",
         'add_l1': "➕ Add Layer 1 Category",
@@ -281,7 +281,7 @@ LANG_DATA = {
         'btn_yes_del': "Yes, Delete Branch"
     },
     'नेपाली': {
-        'title': "⚖️ पदपूर्ति पदसंख्या निर्धारण प्रणाली",
+        'title': "⚖️ लोक सेवा आयोग पदसंख्या निर्धारण प्रणाली",
         'subtitle': "ऐन वा बिनियममा भएको पदपूर्ति तालिका अनुसार प्रतिशत ढाँचा इन्ट्रि गर्नुहोस्।",
         'build_header': "🛠️ पदपूर्ति विधिको वहु-तह संरचना",
         'add_l1': "➕ पहिलो  तहको विधि थप्नुहोस् (तह १)",
