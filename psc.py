@@ -223,7 +223,7 @@ def allocate_schedule(df_config, labels, limit_run=None, calculation_depth="Laye
 LANG_DATA = {
     'English': {
         'title': "⚖️ PSC Post Allocation Builder System",
-        'subtitle': "© Devi Prasad Subedi (dsubedi@gmail.com)",
+        'subtitle1': "© Devi Prasad Subedi (dsubedi@gmail.com)",
         'subtitle': "Construct your organization's legal breakdown hierarchically using relative parent percentages.",
         'build_header': "🛠️ Dynamic Organizational Structure Model",
         'add_l1': "➕ Add Layer 1 Category",
@@ -283,7 +283,7 @@ LANG_DATA = {
     },
     'नेपाली': {
         'title': "⚖️ लोक सेवा आयोग पदसंख्या निर्धारण प्रणाली",
-        'subtitle': "© Devi Prasad Subedi (dsubedi@gmail.com)",
+        'subtitle1': "© Devi Prasad Subedi (dsubedi@gmail.com)",
         'subtitle': "ऐन वा बिनियममा भएको पदपूर्ति तालिका अनुसार प्रतिशत ढाँचा इन्ट्रि गर्नुहोस्।",
         'build_header': "🛠️ पदपूर्ति विधिको वहु-तह संरचना",
         'add_l1': "➕ पहिलो  तहको विधि थप्नुहोस् (तह १)",
@@ -356,6 +356,7 @@ L = LANG_DATA[selected_lang]
 
 with header_left:
     st.title(L['title'])
+    st.write(L['subtitle1'])
     st.write(L['subtitle'])
 
 if 'tree_structure' not in st.session_state:
